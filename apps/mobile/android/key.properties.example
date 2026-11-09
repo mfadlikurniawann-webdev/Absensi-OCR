@@ -1,0 +1,8 @@
+# Salin menjadi key.properties (JANGAN di-commit) lalu isi.
+# Buat keystore sekali saja:
+#   keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+storePassword=isi-password-keystore
+keyPassword=isi-password-key
+keyAlias=upload
+# Path relatif terhadap folder android/app
+storeFile=../upload-keystore.jks

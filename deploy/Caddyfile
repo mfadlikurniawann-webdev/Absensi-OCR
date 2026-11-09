@@ -1,0 +1,9 @@
+# HTTPS otomatis (Let's Encrypt) untuk domain di env DOMAIN.
+# Pastikan DNS domain sudah mengarah ke IP server & port 80/443 terbuka.
+{$DOMAIN} {
+	encode gzip
+	request_body {
+		max_size 10MB
+	}
+	reverse_proxy api:5000
+}

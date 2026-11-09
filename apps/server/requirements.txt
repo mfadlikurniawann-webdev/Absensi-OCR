@@ -1,0 +1,7 @@
+# Server API (Flask + DeepFace). Model Facenet berjalan di ONNX Runtime
+# (bawaan deepface 0.0.104), tanpa TensorFlow.
+flask>=3.0,<4
+deepface==0.0.104
+numpy
+gunicorn>=22
+tzdata

@@ -1,0 +1,28 @@
+# Rahasia
+.env
+*.jks
+*.keystore
+key.properties
+
+# Data pribadi (database wajah & ekspor absensi) - jangan di-commit
+apps/server/data/*
+!apps/server/data/.gitkeep
+*.db
+*.sqlite3
+absensi_export.csv
+
+# Foto uji (diunduh lewat tests/download_fixtures.py)
+apps/server/tests/fixtures/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

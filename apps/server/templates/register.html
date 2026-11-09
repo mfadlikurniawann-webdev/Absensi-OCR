@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrasi Wajah</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+    body { 
+      min-height:100vh; 
+      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364); 
+      display:flex; 
+      justify-content:center; 
+      align-items:center; 
+      padding:20px;
+      overflow:hidden;
+    }
+
+    .gradient-bg { position: fixed; inset:0; z-index:-2; background: linear-gradient(-45deg,#0f172a,#1e293b,#2e1065,#312e81); background-size:400% 400%; animation: gradientMove 20s ease infinite; }
+    .blob { position:absolute; border-radius:50%; filter:blur(60px); opacity:0.3; animation: blobMove 30s infinite alternate ease-in-out; z-index:-1; }
+    .blob1 { width:500px; height:500px; background:radial-gradient(circle, rgba(88,180,255,0.8) 0%, rgba(88,180,255,0) 60%); top:-120px; left:-120px; }
+    .blob2 { width:400px; height:400px; background:radial-gradient(circle, rgba(118,75,162,0.8) 0%, rgba(118,75,162,0) 60%); bottom:-100px; right:-100px; animation-delay:5s; }
+    @keyframes gradientMove{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+    @keyframes blobMove{0%{transform:translate(0,0) scale(1);}100%{transform:translate(100px,-80px) scale(1.2);}}
+
+    .register-card { background:rgba(255,255,255,0.95); border-radius:16px; padding:30px; max-width:650px; width:100%; box-shadow:0 12px 30px rgba(0,0,0,0.3); backdrop-filter:blur(8px); animation: fadeIn 0.8s ease; position:relative; }
+    .register-card h2 { font-weight:600; margin-bottom:20px; text-align:center; }
+    .form-label { font-weight:500; color:#222; margin-top:10px; }
+    .form-control { border-radius:10px; padding:10px; }
+
+    video, canvas { border-radius:12px; border:3px solid #ddd; box-shadow:0 6px 15px rgba(0,0,0,0.2); width:500px; height:380px; margin-top:10px; }
+
+    .btn-custom { font-weight:600; border:none; padding:10px 18px; border-radius:10px; transition:0.3s; }
+    #capture { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; margin-top:15px; }
+    #capture:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(118,75,162,0.4); }
+    #submitBtn { background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; margin-top:10px; width:100%; }
+    #submitBtn:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(22,163,74,0.4); }
+    #cancelBtn { background:linear-gradient(135deg,#f43f5e,#e11d48); color:#fff; margin-top:10px; width:100%; }
+    #cancelBtn:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(244,63,94,0.4); }
+
+    .back-btn { position:absolute; top:15px; left:15px; background:none; border:none; font-size:22px; cursor:pointer; color:#333; text-decoration:none; }
+    .back-btn:hover { color:#000; transform:translateX(-3px); transition:0.2s; }
+
+    .modal-content { border-radius:16px; }
+    .preview-img { width:100%; border-radius:12px; border:3px solid #ddd; }
+
+    /* Toast notif */
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 1055; }
+    
+    @keyframes fadeIn { from{opacity:0;transform:scale(0.96);} to{opacity:1;transform:scale(1);} }
+  </style>
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+
+  <div class="register-card">
+    <a href="/absen" class="back-btn">◀</a>
+    <h2>✍️ Registrasi Wajah</h2>
+
+    <form id="regForm" enctype="multipart/form-data">
+      <label class="form-label">Nama:</label>
+      <input type="text" name="name" class="form-control" required>
+      
+      <label class="form-label">NPM:</label>
+      <input type="text" name="npm" class="form-control" required>
+
+      <div id="camera" class="text-center">
+        <video id="video" autoplay playsinline></video><br>
+        <button type="button" id="capture" class="btn-custom">📸 Ambil Foto</button>
+        <canvas id="canvas" style="display:none;"></canvas>
+      </div>
+
+      <input type="file" name="image" id="imageInput" hidden>
+    </form>
+  </div>
+
+  <!-- Modal Preview -->
+  <div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <h5 class="mb-3">📷 Preview Foto</h5>
+        <img id="previewImg" class="preview-img mb-3" src="">
+        <div class="d-flex gap-2">
+          <button type="button" id="cancelBtn" class="btn-custom" data-bs-dismiss="modal">❌ Batal</button>
+          <button type="button" id="submitBtn" class="btn-custom">✅ Daftar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container">
+    <div id="notifToast" class="toast align-items-center text-bg-danger border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body" id="notifMsg">Wajah sudah terdaftar!</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const captureBtn = document.getElementById("capture");
+    const previewImg = document.getElementById("previewImg");
+    const submitBtn = document.getElementById("submitBtn");
+    const regForm = document.getElementById("regForm");
+    const imageInput = document.getElementById("imageInput");
+    const notifToastEl = document.getElementById("notifToast");
+    const notifToast = new bootstrap.Toast(notifToastEl);
+
+    // 🔹 Fungsi show toast
+    function showToast(message, type="danger") {
+      const msgEl = document.getElementById("notifMsg");
+      msgEl.innerText = message;
+      notifToastEl.className = `toast align-items-center text-bg-${type} border-0`;
+      notifToast.show();
+    }
+
+    // 🔹 Aktifkan kamera
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(err => { showToast("Gagal akses kamera!", "danger"); console.error(err); });
+
+    // 🔹 Capture foto
+    captureBtn.addEventListener("click", () => {
+      const ctx = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(blob => {
+        if (!blob) return;
+        const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        imageInput.files = dt.files;
+
+        previewImg.src = URL.createObjectURL(blob);
+        const modal = new bootstrap.Modal(document.getElementById("previewModal"));
+        modal.show();
+      }, "image/jpeg");
+    });
+
+    // 🔹 Submit data ke server
+submitBtn.addEventListener("click", async () => {
+  const name = regForm.querySelector("input[name='name']").value.trim();
+  const npm = regForm.querySelector("input[name='npm']").value.trim();
+
+  if (!name || !npm || !imageInput.files.length) {
+    showToast("Lengkapi semua data!", "warning");
+    return;
+  }
+
+  const formData = new FormData(regForm);
+
+  try {
+    const res = await fetch("/register", { method: "POST", body: formData });
+    const data = await res.json();
+
+    if (data.success) {
+      showToast(data.message || "Registrasi berhasil!", "success");
+      setTimeout(() => location.href = "/absen", 1500);
+    } else {
+      showToast(data.message || "Wajah sudah terdaftar!", "danger");
+    }
+  } catch (err) {
+    showToast("Gagal kirim data ke server!", "danger");
+  }
+});
+
+  </script>
+</body>
+</html>

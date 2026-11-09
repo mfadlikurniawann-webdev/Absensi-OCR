@@ -1,0 +1,42 @@
+# Lokal / jaringan kantor (HTTP, port 5000):
+#   docker compose up -d --build
+# Produksi di VPS dengan domain + HTTPS otomatis (Caddy + Let's Encrypt):
+#   set DOMAIN & API_BIND=127.0.0.1 di .env, lalu
+#   docker compose --profile https up -d --build
+services:
+  api:
+    build: ./apps/server
+    # Isi API_IMAGE (mis. ghcr.io/<owner>/<repo>/server:latest) untuk memakai
+    # image hasil CI: docker compose pull && docker compose up -d
+    image: ${API_IMAGE:-absensi-api:latest}
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DB_PATH: /data/absensi.db
+    ports:
+      - "${API_BIND:-0.0.0.0}:${API_PORT:-5000}:5000"
+    volumes:
+      - absensi-data:/data
+
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["https"]
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  absensi-data:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Admin - Sistem Absensi Mahasiswa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ======= Global ======= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    }
+
+    /* ======= Background Animasi ======= */
+    .gradient-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      background: linear-gradient(-45deg, #0f172a, #1e293b, #2e1065, #312e81);
+      background-size: 400% 400%;
+      animation: gradientMove 20s ease infinite;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.4;
+      animation: blobMove 30s infinite alternate ease-in-out;
+    }
+
+    .blob1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(88,180,255,0.8) 0%, rgba(88,180,255,0) 60%);
+      top: -150px;
+      left: -150px;
+    }
+
+    .blob2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(118,75,162,0.8) 0%, rgba(118,75,162,0) 60%);
+      bottom: -120px;
+      right: -100px;
+      animation-delay: 5s;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes blobMove {
+      0% { transform: translate(0,0) scale(1); }
+      100% { transform: translate(100px, -80px) scale(1.2); }
+    }
+
+    /* ======= Login Container ======= */
+    .login-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      width: 800px;
+      height: 460px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      animation: fadeIn 0.8s ease;
+    }
+
+    /* ======= Left Panel ======= */
+    .login-left {
+      flex: 1;
+      background: linear-gradient(135deg, #334155, #1e293b);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: 40px;
+      position: relative;
+    }
+
+    .login-left h2 {
+      font-weight: 700;
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+      text-align: left;
+    }
+
+    .login-left p {
+      font-size: 1rem;
+      line-height: 1.5;
+      opacity: 0.9;
+      text-align: left;
+    }
+
+    /* ======= Right Panel ======= */
+    .login-right {
+      flex: 1;
+      padding: 40px 45px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      transition: background 0.3s ease;
+    }
+
+    .login-right:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+
+    .login-right img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin: 0 auto 15px;
+      box-shadow: 0 0 15px rgba(118,75,162,0.3);
+    }
+
+    .login-right h3 {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 25px;
+      color: #111;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #7f56d9;
+      box-shadow: 0 0 6px rgba(127,86,217,0.4);
+    }
+
+    button {
+      width: 100%;
+      padding: 11px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(118,75,162,0.4);
+      opacity: 0.95;
+    }
+
+    .error {
+      color: #e11d48;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* ======= Responsif ======= */
+    @media (max-width: 768px) {
+      .login-container {
+        flex-direction: column;
+        width: 90%;
+        height: auto;
+      }
+      .login-left, .login-right {
+        flex: unset;
+        width: 100%;
+        padding: 25px;
+      }
+      .login-left {
+        align-items: flex-start;
+        justify-content: flex-end;
+      }
+      .login-left h2 { font-size: 1.4rem; }
+      .login-right h3 { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background animasi -->
+  <div class="gradient-bg"></div>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+
+  <!-- Kontainer login -->
+  <div class="login-container">
+    <div class="login-left">
+      <div>
+        <h2>SELAMAT DATANG</h2>
+        <p>Sistem Absensi Mahasiswa<br>Berbasis Pengenalan Wajah</p>
+      </div>
+    </div>
+
+    <div class="login-right">
+      <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo Sistem">
+      <h3>Login Admin</h3>
+
+      {% if error %}
+        <div class="error">{{ error }}</div>
+      {% endif %}
+
+      <form method="post">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Masukkan username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+        </div>
+
+        <button type="submit">Masuk</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

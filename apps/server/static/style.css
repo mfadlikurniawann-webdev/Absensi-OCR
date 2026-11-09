@@ -1,0 +1,141 @@
+/* ========== Global Style ========== */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #e2e8f0;
+  margin: 0;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #38bdf8;
+  margin-bottom: 20px;
+}
+
+p {
+  text-align: center;
+  color: #94a3b8;
+}
+
+/* ========== Container ========== */
+#camera, form, .dashboard {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #1e293b;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+}
+
+/* ========== Video & Canvas ========== */
+video, canvas {
+  display: block;
+  margin: 0 auto 15px;
+  border-radius: 12px;
+  border: 2px solid #334155;
+  width: 100%;
+  max-width: 400px;
+  background: #0f172a;
+}
+
+/* ========== Button Style ========== */
+button {
+  padding: 10px 18px;
+  margin: 5px;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+button#snap {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+button#register, button[type="submit"] {
+  background: #4ade80;
+  color: #0f172a;
+}
+
+button#capture {
+  background: #facc15;
+  color: #0f172a;
+}
+
+button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* ========== Status Message ========== */
+#status {
+  text-align: center;
+  margin-top: 15px;
+  font-weight: 500;
+  color: #f87171;
+}
+
+/* ========== Form Style ========== */
+form label {
+  display: block;
+  margin: 10px 0 5px;
+  color: #cbd5e1;
+}
+
+form input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #475569;
+  margin-bottom: 15px;
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+form input[type="text"]:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 5px #38bdf8;
+}
+
+/* ========== Dashboard Table ========== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #334155;
+}
+
+th {
+  background: #334155;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+tr:hover {
+  background: #0f172a;
+}
+
+/* ========== Export Button (Dashboard) ========== */
+.btn-success {
+  background: #4ade80 !important;
+  border: none;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 12px;
+}
+
+.btn-success:hover {
+  background: #22c55e !important;
+}

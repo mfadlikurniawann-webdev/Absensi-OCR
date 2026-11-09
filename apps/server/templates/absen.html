@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Absensi Mahasiswa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+    body { 
+      min-height:100vh; 
+      background: linear-gradient(135deg,#0f2027,#203a43,#2c5364); 
+      position: relative; 
+      display:flex; 
+      justify-content:center; 
+      align-items:center; 
+      padding:20px;
+      overflow:hidden; /* hilangkan scroll */
+    }
+
+    /* Background animasi */
+    .gradient-bg { position: fixed; inset:0; z-index:-2; background: linear-gradient(-45deg,#0f172a,#1e293b,#2e1065,#312e81); background-size:400% 400%; animation: gradientMove 20s ease infinite; }
+    .blob { position:absolute; border-radius:50%; filter:blur(60px); opacity:0.3; animation: blobMove 30s infinite alternate ease-in-out; z-index:-1; }
+    .blob1 { width:500px; height:500px; background:radial-gradient(circle, rgba(88,180,255,0.8) 0%, rgba(88,180,255,0) 60%); top:-120px; left:-120px; }
+    .blob2 { width:400px; height:400px; background:radial-gradient(circle, rgba(118,75,162,0.8) 0%, rgba(118,75,162,0) 60%); bottom:-100px; right:-100px; animation-delay:5s; }
+    @keyframes gradientMove{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+    @keyframes blobMove{0%{transform:translate(0,0) scale(1);}100%{transform:translate(100px,-80px) scale(1.2);}}
+
+    /* Card utama */
+    .absen-card { background:rgba(255,255,255,0.95); border-radius:16px; padding:30px; max-width:650px; width:100%; text-align:center; box-shadow:0 12px 30px rgba(0,0,0,0.3); backdrop-filter:blur(8px); animation: fadeIn 0.8s ease; }
+    .absen-card h2 { font-weight:600; margin-bottom:10px; }
+    .absen-card p { color:#444; margin-bottom:20px; }
+
+   video, canvas {
+  border-radius:12px;
+  border:3px solid #ddd;
+  box-shadow:0 6px 15px rgba(0,0,0,0.2);
+  max-width:500px;
+  width:100%;
+  height:auto;
+}
+
+
+    /* Tombol */
+    .btn-custom { font-weight:600; border:none; padding:10px 18px; border-radius:10px; transition:0.3s; }
+    #snap { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+    #snap:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(118,75,162,0.4); }
+    #register { background:linear-gradient(135deg,#ff6a6a,#ff3d3d); color:#fff; margin-left:10px; }
+    #register:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(255,61,61,0.4); }
+    #stopCam { background:linear-gradient(135deg,#f87171,#ef4444); color:#fff; margin-left:10px; }
+    #startCam { background:linear-gradient(135deg,#22c55e,#16a34a); color:#fff; margin-left:10px; }
+
+    /* Status text */
+    #status { margin-top:15px; font-weight:500; color:#111; }
+
+    @keyframes fadeIn { from{opacity:0;transform:scale(0.96);} to{opacity:1;transform:scale(1);} }
+  </style>
+</head>
+<body>
+  <div class="gradient-bg"></div>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+
+  <div class="absen-card">
+    <h2>📷 Absensi Mahasiswa</h2>
+    <p>Silakan lakukan absensi wajah Anda</p>
+
+    <div id="camera">
+      <video id="video" autoplay></video>
+      <br><br>
+      <button id="snap" class="btn-custom">📌 Ambil Foto & Absen</button>
+      <button id="register" class="btn-custom">➕ Daftar Wajah Baru</button>
+      <button id="stopCam" class="btn-custom">🛑 Matikan Kamera</button>
+      <button id="startCam" class="btn-custom">▶️ Hidupkan Kamera</button>
+      <canvas id="canvas" width="500" height="380" style="display:none;"></canvas>
+    </div>
+
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const snap = document.getElementById("snap");
+    const register = document.getElementById("register");
+    const stopCam = document.getElementById("stopCam");
+    const startCam = document.getElementById("startCam");
+    const status = document.getElementById("status");
+    const context = canvas.getContext("2d");
+
+    let stream;
+
+    // fungsi hidupkan kamera
+    function startCamera() {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(s => {
+          stream = s;
+          video.srcObject = stream;
+          status.textContent = "📷 Kamera aktif.";
+        })
+        .catch(err => { status.textContent = "Gagal mengakses kamera: " + err; });
+    }
+
+    // fungsi matikan kamera
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+        status.textContent = "📴 Kamera dimatikan.";
+      }
+    }
+
+    // langsung aktifkan kamera saat load
+    startCamera();
+
+    // event klik tombol absen (backend tetap sama)
+    snap.addEventListener("click", () => {
+      context.drawImage(video, 0, 0, 500, 380);
+      const dataURL = canvas.toDataURL("image/jpeg");
+
+      fetch("/absensi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: dataURL })
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if(data.recognized) {
+          status.textContent = `✅ Absensi berhasil: ${data.name} (NPM: ${data.npm}) pada ${data.waktu}`;
+        } else {
+          status.textContent = data.message || "Respon tidak dikenali";
+        }
+      })
+      .catch(err => {
+        status.textContent = "❌ Gagal kirim absensi!";
+        console.error(err);
+      });
+    });
+
+    // event klik tombol register (backend tetap sama)
+    register.addEventListener("click", () => {
+      window.location.href = "/register";
+    });
+
+    // event tombol kamera
+    stopCam.addEventListener("click", stopCamera);
+    startCam.addEventListener("click", startCamera);
+  </script>
+</body>
+</html>
